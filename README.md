@@ -4,14 +4,9 @@ sur un réseau TCP/IP au travers du WIFI et d'un mécanisme WebSocket.
 
 *******
 Table des matières
- 1. [Concept du Module TIC ?](#concept)
- 2. [Mes motivations](#motivation)
+ 1. [Mes motivations](#motivation)
+ 2. [Concept du Module TIC ?](#concept)
 *******
-
-<div id='concept'/> 
-
-## Concept du Module TIC
-Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module_TIC/wiki) pour plus d'informations concernant le concept.
 
 <div id='motivation'/> 
 
@@ -22,5 +17,10 @@ Le but étant par la suite d'effectuer l'asservissement des équipements en fonc
  2. Du ballon d'eau chaude,
  3. De Miner de bitcoin,
  4. etc...
+
+<div id='concept'/> 
+
+## Concept du Module TIC
+Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module_TIC/wiki) pour plus d'informations concernant le concept.
  
  ###### Auteur : *Sébastien DALIGAULT*. 
