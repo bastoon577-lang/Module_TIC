@@ -6,7 +6,6 @@ sur un réseau TCP/IP au travers du WIFI et d'un mécanisme WebSocket.
 Table des matières
  1. [Concept du Module TIC ?](#concept)
  2. [Mes motivations](#motivation)
- 3. [Comment compiler/flasher l'ESP01 ?](#howdoesmoduleticbuild)
 *******
 
 <div id='concept'/> 
@@ -23,15 +22,5 @@ Le but étant par la suite d'effectuer l'asservissement des équipements en fonc
  2. Du ballon d'eau chaude,
  3. De Miner de bitcoin,
  4. etc...
- 
- <div id='howdoesmoduleticbuild'/> 
-
-## Comment compiler/flasher l'ESP01 ?
-La compilation/téléversement du projet Module TIC implique les étapes suivantes :
- * Installation de [l'IDE Arduino](https://www.arduino.cc/en/software/).
- * Configuration de l'environnement en suivant [ceci](https://fr.macerobotics.com/developpeur/tutoriels/programmer-le-microcontroleur-esp8266-avec-lide-arduino/).
- * Installation ou téléchargement de la librairie [WebSockets_Generic](https://github.com/khoih-prog/WebSockets_Generic).
-
-Enfin, le flashage de l'ESP01 requiert une manipulation expliquée [ici](https://www.diyhobi.com/flash-program-esp-01-using-usb-serial-adapter/), suivez ces instructions, puis téléversez, et le tour et joué.
  
  ###### Auteur : *Sébastien DALIGAULT*. 
