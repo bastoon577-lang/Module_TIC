@@ -11,7 +11,7 @@ Table des matières
 <div id='concept'/> 
 
 ## Concept du Module TIC
-Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module-TIC-SOFTWARE/wiki) pour plus d'informations concernant le concept.
+Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module_TIC/wiki) pour plus d'informations concernant le concept.
 
 <div id='motivation'/> 
 
