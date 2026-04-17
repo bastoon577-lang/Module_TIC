@@ -244,7 +244,7 @@ void setup() {
       WiFi.begin(static_conf.SmSsid,static_conf.SmPass);                // Connexion au réseau
     }
     else                                                                // Aucun reseau Wifi n'est configué                                              
-      WiFi.softAP(static_conf.SmSsid,static_conf.SmPass,AP_CHANNEL,AP_VISIBILITE,AP_MAX_CONN); // Creation du Hotspot  
+      WiFi.softAP(static_conf.SmSsid,static_conf.SmPass,AP_CHANNEL,AP_VISIBILITE,AP_MAX_EXPL_CONN); // Creation du Hotspot  
 
     // Initialisation de la page d'exploitation
     web_server.on("/", HTTP_GET, []() {
@@ -259,7 +259,7 @@ void setup() {
   }
   else                                                                  // L'equipement est vierge
   {
-    WiFi.softAP(AP_SSID,AP_PASS,AP_CHANNEL,AP_VISIBILITE,AP_MAX_CONN);  // Creation du Hotspot ModuleTIC
+    WiFi.softAP(AP_SSID,AP_PASS,AP_CHANNEL,AP_VISIBILITE,AP_MAX_CONF_CONN); // Creation du Hotspot ModuleTIC
     memcpy(&static_conf.Hostname,AP_SSID,sizeof(AP_SSID));              // Sauvegarde du Hostname par defaut
     memcpy(&static_conf.SmSsid,AP_SSID,sizeof(AP_SSID));                // Sauvegarde du SSID par defaut
     memcpy(&static_conf.SmPass,AP_PASS,sizeof(AP_PASS));                // Sauvegarde du Password par defaut

@@ -13,7 +13,8 @@
 #define AP_PASS                   AP_SSID               // Password ModuleTIC Access Point
 #define AP_CHANNEL                0                     // Channel ModuleTIC Access Point
 #define AP_VISIBILITE             false                 // Visibilite ModuleTIC Access Point
-#define AP_MAX_CONN               1                     // Nombre de connexion ModuleTIC Access Point
+#define AP_MAX_CONF_CONN          1                     // Nombre de connexion en mode configuration du ModuleTIC Access Point
+#define AP_MAX_EXPL_CONN          5                     // Nombre de connexion en mode exploitation du ModuleTIC Access Point
 #define AP_TCP_PORT               8082                  // Port TCP ModuleTIC Access Point
 
 //< Define des Timeout
