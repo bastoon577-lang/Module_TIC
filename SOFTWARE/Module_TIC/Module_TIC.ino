@@ -16,7 +16,7 @@
 //< Déclaration des variables globales
 static VOLATILE_CONF_FIELDS_t volatile_conf;
 static STATIC_CONF_FIELDS_t static_conf;
-static ESP8266WebServer web_server(80);
+static ESP8266WebServer web_server(0);
 static short wifi_equipments;
 static TIC_DATA_t tic_data;
 static bool dhcp_enable;
@@ -286,7 +286,7 @@ void setup() {
 
   ArduinoOTA.setHostname(static_conf.Hostname);                         // Initialisation du Hostname OTA
   WiFi.hostname(static_conf.Hostname);                                  // Initialisation du Hostname Web
-  web_server.begin();                                                   // Activation du serveur Web
+  web_server.begin(static_conf.port);                                   // Activation du serveur Web
   ArduinoOTA.begin();                                                   // Activation du service OTA
 }
 

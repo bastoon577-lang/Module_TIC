@@ -133,7 +133,8 @@ const char* scriptsPageConfig PROGMEM = R"rawliteral(
   }
 
   function validatePORT(value) {
-    if (value < 1 || value > 65535) {
+    const port = Number(value);
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
       alert("Le port est invalide. Veuillez entrer un numéro entre 1 et 65535.");
       return false;
     }
@@ -237,7 +238,7 @@ const char* scriptsPageConfig PROGMEM = R"rawliteral(
   });
 
   document.getElementById('por2-submit').addEventListener('click',function(){
-    validateAndProceed('por1',20);
+    validateAndProceed('por2',20);
   });
 
   function formatIp(ip) {
