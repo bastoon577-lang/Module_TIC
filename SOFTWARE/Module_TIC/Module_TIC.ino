@@ -263,7 +263,7 @@ void setup() {
     memcpy(&static_conf.Hostname,AP_SSID,sizeof(AP_SSID));              // Sauvegarde du Hostname par defaut
     memcpy(&static_conf.SmSsid,AP_SSID,sizeof(AP_SSID));                // Sauvegarde du SSID par defaut
     memcpy(&static_conf.SmPass,AP_PASS,sizeof(AP_PASS));                // Sauvegarde du Password par defaut
-    static_conf.portWs = 81;                                            // Sauvegarde du Port WebSocket par defaut
+    static_conf.portWs = 443;                                           // Sauvegarde du Port WebSocket par defaut
     static_conf.port   = 80;                                            // Sauvegarde du Port Web par defaut
 
     // Initialisation de la page de configuration

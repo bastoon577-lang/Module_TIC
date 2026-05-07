@@ -14,6 +14,7 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
 
   <div id="container3" class="container">
     <h1>Configuration Wi-Fi</h1>
+    <p>Sélectionnez le réseau :</p>
     <div id="wifiList">
     </div>
     <button class="button warning" onclick="next(4)">Saisie manuelle</button>
@@ -21,60 +22,68 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
 
   <div id="container4" class="container">
     <h1>Configuration Wi-Fi</h1>
+    <p>Renseignez le nom de réseau désiré :</p>
     <input type="text" id="ssid1" placeholder="Entrez le SSID">
     <button class="button" id="ssid1-submit">Soumettre</button>
   </div>
 
   <div id="container5" class="container">
     <h1>Configuration Wi-Fi</h1>
-    <input type="password" id="mdp1" placeholder="Entrez le mot de passe">
-    <input type="password" id="mdp11" placeholder="Confirmez le mot de passe">
+    <p>Renseignez la clé de sécurité du réseau :</p>
+    <input type="password" id="mdp1" placeholder="Entrez la clé de sécurité">
+    <input type="password" id="mdp11" placeholder="Confirmez la clé de sécurité">
     <button class="button" id="mdp1-submit">Soumettre</button>
   </div>
 
   <div id="container6" class="container">
-    <h1>Configuration Wi-Fi</h1>
-    <input type="text" id="hot1" placeholder="Entrez l'Hostname">
+    <h1>Configuration Réseau</h1>
+    <p>L'Hostname par défaut sera "ModuleTIC", vous pouvez toutefois le personnaliser :</p>
+    <input type="text" id="hot1" placeholder="ModuleTIC">
     <button class="button" id="hot1-submit">Soumettre</button>
   </div>
 
   <div id="container7" class="container">
-    <h1>Configuration Wi-Fi</h1>
-    <button class="button secondary" onclick="toggleAdvancedConfig()">Configurations avancées</button>
+    <h1>Configuration Réseau</h1>
+    <p>Le mode DHCP sera actif par défaut, vous pouvez toutefois forcer une IP statique :</p>
+    <button class="button secondary" onclick="toggleAdvancedConfig()">Configuration avancée</button>
     <div id="advancedConfig" style="display: none;">
-      <input type="text" id="ip" placeholder="Adresse IP de l'équipement">
+      <input type="text" id="ip" placeholder="Adresse IP statique">
       <input type="text" id="mask" placeholder="Masque de sous-réseau">
       <input type="text" id="gateway" placeholder="Passerelle">
     </div>
     <button class="button" id="advanced-submit">Soumettre</button>
+    <p class="alert">Il est peu recommandé de désactiver le DHCP, privilégiez une configuration du serveur DHCP</p>
   </div>
 
   <div id="container8" class="container">
     <h1>Configuration Wi-Fi</h1>
     <p>Votre ModuleTIC restera accessible en Wi-Fi sur ces identifiants. Souhaitez-vous personnaliser les identifiants Wi-Fi (SSID/Clé de sécurité réseau)?</p>
+    <button class="button" onclick="next(9)">Oui, les personnaliser</button>
+    <button class="button secondary" onclick="next(11)">Non, utiliser ceux-ci</button>
     <p class="alert">Il est fortement recommandé de modifier ces paramètres !</p>
-    <button class="button" onclick="next(9)">Oui</button>
-    <button class="button secondary" onclick="next(11)">Non</button>
   </div>
 
   <div id="container9" class="container">
     <h1>Configuration Wi-Fi</h1>
+    <p>Renseignez le nom de réseau désiré :</p>
     <input type="text" id="ssid2" placeholder="Entrez le SSID">
     <button class="button" id="ssid2-submit">Soumettre</button>
   </div>
 
   <div id="container10" class="container">
     <h1>Configuration Wi-Fi</h1>
-    <input type="password" id="mdp2" placeholder="Entrez le mot de passe">
-    <input type="password" id="mdp22" placeholder="Confirmez le mot de passe">
+    <p>Renseignez la clé de sécurité du réseau :</p>
+    <input type="password" id="mdp2" placeholder="Entrez la clé de sécurité">
+    <input type="password" id="mdp22" placeholder="Confirmez la clé de sécurité">
     <button class="button" id="mdp2-submit">Soumettre</button>
   </div>
 
   <div id="container11" class="container">
     <h1>Configuration Web</h1>
-    <p>Le port de service Web par défaut est le "80", souhaitez-vous le modifer ?</p>
-    <button class="button" onclick="next(12)">Oui</button>
-    <button class="button secondary" onclick="next(13)">Non</button>
+    <p>Le port de service Web par défaut est le "80", souhaitez-vous le conserver ?</p>
+    <button class="button" onclick="next(13)">Oui, utiliser le 80</button>
+    <button class="button secondary" onclick="next(12)">Non, le modifier</button>
+    <p class="alert">Il est peu recommandé de modifier le port de service WEB</p>
   </div>
 
   <div id="container12" class="container">
@@ -85,9 +94,9 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
 
   <div id="container13" class="container">
     <h1>Configuration WebSocket</h1>
-    <p>Le port de service WebSocket par défaut est le "81", souhaitez-vous le modifer ?</p>
-    <button class="button" onclick="next(14)">Oui</button>
-    <button class="button secondary" onclick="next(20)">Non</button>
+    <p>Le port de service WebSocket par défaut est le "443", souhaitez-vous le concerver ?</p>
+    <button class="button" onclick="next(20)">Oui, utiliser le 443</button>
+    <button class="button secondary" onclick="next(14)">Non, le modifier</button>
   </div>
 
   <div id="container14" class="container">
@@ -98,13 +107,14 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
 
   <div id="container20" class="container">
     <h1>Félicitation</h1>
-    <p>Vous avez terminé la configuration de votre équipement ModuleTIC. Votre équipement doit redémarrer...</p>
+    <p>Vous avez terminé la configuration du ModuleTIC. Votre équipement doit redémarrer...</p>
     <button class="button" onclick="handleRequest('end',function(){next(31);})">Redémarrer</button>
   </div>
 
   <div id="container31" class="container">
     <h1>Redémarrage</h1>
-    <p>En cours...</p>
+    <p>La configuration à été prise en compte, votre équipement à redémarré</p>
+    <p class="alert">La connexion avec le ModuleTIC est perdue, veuillez vous reconnecter</p>
   </div>
 )rawliteral";
 
