@@ -175,7 +175,7 @@ const char* scriptsPageConfig PROGMEM = R"rawliteral(
     if (confirmId) {
       const confirmValue = document.getElementById(confirmId).value;
       if (value !== confirmValue) {
-        alert("Les mots de passe ne correspondent pas. Veuillez réessayer.");
+        alert("Les clés de sécurité ne correspondent pas.");
         return false;
       }
     }
