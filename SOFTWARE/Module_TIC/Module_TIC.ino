@@ -148,7 +148,7 @@ static void html_generate_configuration_page(void) {
   web_server.sendContent(FPSTR(scriptsCommon));
   web_server.sendContent(FPSTR(scriptsPageConfig));
   for(uint8_t i=0;i<wifi_equipments;i++)
-    web_server.sendContent("    addWifiSpot(\""+WiFi.SSID(i)+"\");\n");
+    web_server.sendContent("  addWifiSpot(\""+WiFi.SSID(i)+"\");\n");
   web_server.sendContent(F("  </script>\n"));
   web_server.sendContent(F("</body>\n"));
   web_server.sendContent(F("</html>"));
