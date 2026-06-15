@@ -2,6 +2,8 @@
 Le Module TIC est un équippement fonctionnant sur plateforme [ESP01](https://www.captain-arduino.fr/esp8266-01s/) capable d'extraire les données issues du bornier TIC du compteur Linky et de les partager/offrir
 sur un réseau TCP/IP au travers du WIFI et d'un mécanisme WebSocket.
 
+<div align="center"><img width="604" height="518" alt="ModuleTIC" src="https://github.com/user-attachments/assets/b665a905-9382-4bed-ac27-a94a206bf244" /></div>
+
 *******
 Table des matières
  1. [Mes motivations](#motivation)
