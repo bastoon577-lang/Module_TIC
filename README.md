@@ -8,6 +8,7 @@ sur un réseau TCP/IP au travers du WIFI et d'un mécanisme WebSocket.
 Table des matières
  1. [Mes motivations](#motivation)
  2. [Concept du Module TIC ?](#concept)
+ 3. [Reproduction hardware](#hard)
 *******
 
 <div id='motivation'/> 
@@ -24,5 +25,13 @@ Le but étant par la suite d'effectuer l'asservissement des équipements en fonc
 
 ## Concept du Module TIC
 Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module_TIC/wiki) pour plus d'informations concernant le concept.
+
+<div id='hard'/>
+
+## Reproduction hardware
+
+J'ai mis à disposition les sources complètes (BOM, GERBER, etc.) pour la reproduction du PCB ModuleTIC [ici](https://oshwlab.com/sebastiendaligault577/module-tic) que j'ai fait imprimé chez [JLCPCB](https://jlcpcb.com/fr/?from=t1_france&gad_source=1&gad_campaignid=22816912221&gclid=CjwKCAjwxb7RBhA5EiwAQ-AAdAA14H3HSPcA5iJi0b9ELBZxiE4g4ar-gzyYgUTeqq2lm2xu-K8XbBoCG00QAvD_BwE).
+
+J'en ai évidement quelques exemplaires n'hésitez pas à rentrer en contact avec moi en MP 😉
  
  ###### Auteur : *Sébastien DALIGAULT*. 
