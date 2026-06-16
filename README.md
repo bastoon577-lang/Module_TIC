@@ -32,6 +32,6 @@ Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module
 
 J'ai mis à disposition les sources complètes (BOM, GERBER, etc.) pour la reproduction du PCB ModuleTIC [ici](https://oshwlab.com/sebastiendaligault577/module-tic) que j'ai fait imprimé chez [JLCPCB](https://jlcpcb.com/fr/?from=t1_france&gad_source=1&gad_campaignid=22816912221&gclid=CjwKCAjwxb7RBhA5EiwAQ-AAdAA14H3HSPcA5iJi0b9ELBZxiE4g4ar-gzyYgUTeqq2lm2xu-K8XbBoCG00QAvD_BwE).
 
-J'en ai évidement quelques exemplaires n'hésitez pas à rentrer en contact avec moi en MP 😉
+J'ai du matériel à disposition, pour plus d'informations [rentrer en contact avec moi en MP](https://github.com/bastoon577-lang/Module_TIC/wiki/Fourniture-Hardware) 😉
  
  ###### Auteur : *Sébastien DALIGAULT*. 
