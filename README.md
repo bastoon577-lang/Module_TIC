@@ -8,7 +8,8 @@ sur un réseau TCP/IP au travers du WIFI et d'un mécanisme WebSocket.
 Table des matières
  1. [Mes motivations](#motivation)
  2. [Concept du Module TIC ?](#concept)
- 3. [Reproduction hardware](#hard)
+ 3. [Notice d'utilisation](#useit)
+ 4. [Reproduction hardware](#hard)
 *******
 
 <div id='motivation'/> 
@@ -25,6 +26,11 @@ Le but étant par la suite d'effectuer l'asservissement des équipements en fonc
 
 ## Concept du Module TIC
 Veuillez consulter le [Wiki du projet](https://github.com/bastoon577-lang/Module_TIC/wiki) pour plus d'informations concernant le concept.
+
+<div id='useit'/> 
+
+## Notice d'utilisation
+Veuillez consulter la [notice d'utilisation](https://github.com/bastoon577-lang/Module_TIC/blob/main/USER_MANUAL/Notice%20Module%20TIC.pdf) pour plus d'informations.
 
 <div id='hard'/>
 
