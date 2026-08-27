@@ -6,7 +6,7 @@
 #include "hal_utils.h"
 
 //< MACRO de version logicielle
-#define V_LOGICIEL                "v1"                  // Version Logicielle
+#define V_LOGICIEL                "v1.0.0"              // Version Logicielle
 
 //< MACRO du Mode Access Point
 #define AP_SSID                   "ModuleTIC"           // SSID ModuleTIC Access Point
