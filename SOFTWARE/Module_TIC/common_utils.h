@@ -6,7 +6,7 @@
 #include "hal_utils.h"
 
 //< MACRO de version logicielle
-#define V_LOGICIEL                "v1.0.0"              // Version Logicielle
+#define V_LOGICIEL                "v1.0.1"              // Version Logicielle
 
 //< MACRO du Mode Access Point
 #define AP_SSID                   "ModuleTIC"           // SSID ModuleTIC Access Point
@@ -16,6 +16,7 @@
 #define AP_MAX_CONF_CONN          1                     // Nombre de connexion en mode configuration du ModuleTIC Access Point
 #define AP_MAX_EXPL_CONN          5                     // Nombre de connexion en mode exploitation du ModuleTIC Access Point
 #define AP_TCP_PORT               8082                  // Port TCP ModuleTIC Access Point
+#define AP_DNS_CAPTIVE_PORTAL     53                    // Port DNS du Portail Captif
 
 //< Define des Timeout
 #define TIMEOUT_SCAN_NETWORK      300000                // Temps de scrutation des réseaux Wifi disponibles (5 Minutes)
