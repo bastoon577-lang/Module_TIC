@@ -1,5 +1,6 @@
 #include <ESP8266WebServer.h>
 #include <ArduinoOTA.h>
+#include <DNSServer.h>
 
 #include "tic_extract_utils.h"
 #include "websocket_utils.h"
@@ -18,6 +19,7 @@ static VOLATILE_CONF_FIELDS_t volatile_conf;
 static STATIC_CONF_FIELDS_t static_conf;
 static ESP8266WebServer web_server(0);
 static short wifi_equipments;
+static DNSServer dns_server;
 static TIC_DATA_t tic_data;
 static bool dhcp_enable;
 
@@ -216,7 +218,7 @@ static void handle_action_configuration_input(void) {
 }
 
 void setup() {
-  const uint8_t null_ip[4] = {0,0,0,0};
+  const uint8_t null_ip[4] = {0,0,0,0};                                 // Vecteur d'IP NULL
   dhcp_enable = 0;
 
   hal_init();                                                           // Initialisationd de la HAL
@@ -243,8 +245,11 @@ void setup() {
         WiFi.config(static_conf.address,static_conf.gateway,static_conf.subnet); // Application de la configuration                                 
       WiFi.begin(static_conf.SmSsid,static_conf.SmPass);                // Connexion au réseau
     }
-    else                                                                // Aucun reseau Wifi n'est configué                                              
-      WiFi.softAP(static_conf.SmSsid,static_conf.SmPass,AP_CHANNEL,AP_VISIBILITE,AP_MAX_EXPL_CONN); // Creation du Hotspot  
+    else                                                                // Aucun reseau Wifi n'est configué
+    {
+      WiFi.mode(WIFI_AP);                                               // Forçage en mode Access Point
+      WiFi.softAP(static_conf.SmSsid,static_conf.SmPass,AP_CHANNEL,AP_VISIBILITE,AP_MAX_EXPL_CONN); // Creation du Hotspot ModuleTIC
+    }
 
     // Initialisation de la page d'exploitation
     web_server.on("/", HTTP_GET, []() {
@@ -259,7 +264,13 @@ void setup() {
   }
   else                                                                  // L'equipement est vierge
   {
+    IPAddress ap_ip(192,168,4,1);                                       // Forçage de l'IP AP en 192.168.4.1
+	  WiFi.mode(WIFI_AP);		 											                        // Forçage en mode Access Point
+    WiFi.softAPConfig(ap_ip,ap_ip,IPAddress(255,255,255,0));            // Configuration de l'AP
     WiFi.softAP(AP_SSID,AP_PASS,AP_CHANNEL,AP_VISIBILITE,AP_MAX_CONF_CONN); // Creation du Hotspot ModuleTIC
+    
+	  dns_server.start(AP_DNS_CAPTIVE_PORTAL,"*",ap_ip);        					// Démarrage du serveur DNS (Redirige * vers l'IP de l'AP)
+	
     memcpy(&static_conf.Hostname,AP_SSID,sizeof(AP_SSID));              // Sauvegarde du Hostname par defaut
     memcpy(&static_conf.SmSsid,AP_SSID,sizeof(AP_SSID));                // Sauvegarde du SSID par defaut
     memcpy(&static_conf.SmPass,AP_PASS,sizeof(AP_PASS));                // Sauvegarde du Password par defaut
@@ -279,6 +290,12 @@ void setup() {
     web_server.on("/por1",HTTP_POST,handle_action_configuration_input);
     web_server.on("/por2",HTTP_POST,handle_action_configuration_input);
     web_server.on("/end",HTTP_POST,handle_action_configuration_button);
+	
+	  // Redirection des requêtes de détection de portail captif
+	  web_server.onNotFound([]() {
+      web_server.sendHeader("Location","http://192.168.4.1/",true);
+      web_server.send(302,"text/plain","");
+    });
 
     wifi_equipments = WiFi.scanNetworks();                              // Scan des reseaux Wifi disponibles
     led_init(TIMEOUT_LED_RAPI);                                         // Clignotement rapide de la LED
@@ -294,6 +311,7 @@ void loop() {
   static unsigned long timer_scan_network = millis();
 
   if(!static_conf.is_configured) {                                      // L'équippement n'est pas configuré
+    dns_server.processNextRequest();                                    // Traitement des requêtes DNS du portail captif
     if(millis() - timer_scan_network >= TIMEOUT_SCAN_NETWORK) {
       wifi_equipments = WiFi.scanNetworks();                            // Scan des reseaux Wifi disponibles
       timer_scan_network = millis();
