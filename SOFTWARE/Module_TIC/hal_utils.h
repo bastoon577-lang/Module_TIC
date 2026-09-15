@@ -9,11 +9,23 @@
 #define GPIO_DMD_RESET            0                     // GPIO du bouton Reset
 #define GPIO_LED_IHM              2                     // GPIO de la LED
 
+//< Définition des vitesses UART
+#define HISTORIC_BAUDRATES        1200                  // Vitesse en mode Historique
+#define STANDARD_BAUDRATES        9600                  // Vitesse en mode Standard
+
 /**
  * \fn void hal_init(void)
  * \brief Fonction permettant d'initialiser la HAL
  */
 void hal_init(void);
+
+/**
+ * \fn hal_uart_init(uint8_t mode)
+ * \brief Fonction permettant d'initialiser l'UART en fonction du mode
+ *    - Historique
+ *    - Standard
+ */
+void hal_uart_init(uint8_t standard_mode);
 
 /**
  * \fn void hal_toggle_led(void)

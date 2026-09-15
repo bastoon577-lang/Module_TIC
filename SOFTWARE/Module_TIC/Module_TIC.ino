@@ -101,8 +101,10 @@ static void html_generate_exploitation_page(void) {
   
   // Données Générales
   web_server.sendContent(F("    createTable(\"tab2\");\n"));
-  str_to_write = (dhcp_enable)?"Actif":"Inactif";
   web_server.sendContent("    addTableRow(\"tab2\",\"Logiciel\",\""+String(V_LOGICIEL)+"\");\n");
+  str_to_write = (static_conf.is_standard_mode)?"Standard":"Historique";
+  web_server.sendContent("    addTableRow(\"tab2\",\"Mode\",\""+str_to_write+"\");\n");
+  str_to_write = (dhcp_enable)?"Actif":"Inactif";
   web_server.sendContent("    addTableRow(\"tab2\",\"DHCP\",\""+str_to_write+"\");\n");
   web_server.sendContent("    addTableRow(\"tab2\",\"Hostname\",\""+String(static_conf.Hostname)+"\");\n");
   web_server.sendContent("    addTableRow(\"tab2\",\"MAC\",\""+String(WiFi.macAddress())+"\");\n");
@@ -182,6 +184,8 @@ static void handle_action_configuration_button(void) {
   uint8_t conf = post_data.charAt(3)-'0';
   if(post_data.startsWith("wif"))
     static_conf.is_wifi_network_used = (conf)?1:0;
+  else if(post_data.startsWith("mod"))
+    static_conf.is_standard_mode = (conf)?1:0;
   else if(post_data.endsWith("end"))                                    // Signal de fin de configuration
   {
     static_conf.is_configured = 1;                                      // Positionnement du flag de configuration
@@ -259,6 +263,7 @@ void setup() {
     web_server.on("/reset",HTTP_POST,handle_action_exploitation_button);
 
     ws_server_init(static_conf.portWs,&tic_data);                       // Initialisation du service WebSocket Server
+    hal_uart_init(static_conf.is_standard_mode);                        // Initialisation de l'UART
     tic_extract_init(&tic_data);                                        // Initialisation du service TIC_EXTRACT
     led_init(TIMEOUT_LED_LENT);                                         // Clignotement lent de la LED
   }
@@ -283,6 +288,8 @@ void setup() {
     });
     web_server.on("/wif0",HTTP_POST,handle_action_configuration_button);
     web_server.on("/wif1",HTTP_POST,handle_action_configuration_button);
+    web_server.on("/mod0",HTTP_POST,handle_action_configuration_button);
+    web_server.on("/mod1",HTTP_POST,handle_action_configuration_button);
     web_server.on("/adv0",HTTP_POST,handle_action_configuration_input);
     web_server.on("/hot1",HTTP_POST,handle_action_configuration_input);
     web_server.on("/ssi1",HTTP_POST,handle_action_configuration_input);

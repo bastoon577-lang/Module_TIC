@@ -43,7 +43,8 @@ typedef struct
   uint16_t  portWs;                                     // Port de service WebSocket
   uint8_t   is_configured         : 1;                  // Bitfield indiquant que l'équippement est configuré
   uint8_t   is_wifi_network_used  : 1;                  // Bitfield indiquant un accrochage sur une borne Wifi
-  uint8_t   RUF                   : 6;                  // Reservé Usage Future
+  uint8_t   is_standard_mode      : 1;                  // Bitfield indiquant que le compteur est en mode Standard
+  uint8_t   RUF                   : 5;                  // Reservé Usage Future
 } STATIC_CONF_FIELDS_t;
 
 //< Structure de Configurations fonctionnelles qui peuvent evoluer dans le temps (Configurable à la volé dans l'onglet d'exploitation)

@@ -95,7 +95,7 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
   <div id="container13" class="container">
     <h1>Configuration WebSocket</h1>
     <p>Le port de service WebSocket par défaut est le "443", souhaitez-vous le concerver ?</p>
-    <button class="button" onclick="next(20)">Oui, utiliser le 443</button>
+    <button class="button" onclick="next(15)">Oui, utiliser le 443</button>
     <button class="button secondary" onclick="next(14)">Non, le modifier</button>
   </div>
 
@@ -103,6 +103,14 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
     <h1>Configuration WebSocket</h1>
     <input type="text" id="por2" placeholder="Entrez le port de service WebSocket">
     <button class="button" id="por2-submit">Soumettre</button>
+  </div>
+  
+  <div id="container15" class="container">
+    <h1>Configuration Linky</h1>
+    <p></p>
+	<button class="button" onclick="handleRequest('mod0',function(){next(20);})">Historique</button>
+    <button class="button" onclick="handleRequest('mod1',function(){next(20);})">Standard</button>
+	<p class="alert">Le mode est géré par le compteur Linky, il est essentiel de vérifier celui-ci en navigant dans son Menu</p>
   </div>
 
   <div id="container20" class="container">
@@ -248,7 +256,7 @@ const char* scriptsPageConfig PROGMEM = R"rawliteral(
   });
 
   document.getElementById('por2-submit').addEventListener('click',function(){
-    validateAndProceed('por2',20);
+    validateAndProceed('por2',15);
   });
 
   function formatIp(ip) {
