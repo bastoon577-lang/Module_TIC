@@ -6,7 +6,7 @@
 #include "hal_utils.h"
 
 //< MACRO de version logicielle
-#define V_LOGICIEL                "v1.0.1"              // Version Logicielle
+#define V_LOGICIEL                "v1.0.2"              // Version Logicielle
 
 //< MACRO du Mode Access Point
 #define AP_SSID                   "ModuleTIC"           // SSID ModuleTIC Access Point
@@ -25,10 +25,10 @@
 #define TIMEOUT_LED_RAPI          50                    // Clignotement rapide de la LED
 
 //< Define des données TIC
-#define MAX_BUFFER_SIZE           50                    // Taille du buffer d'accumation
-#define MAX_TIC_DATA              26                    // Nombre maximum de données TIC
-#define MAX_SIZE_LABEL            9                     // Taille maximum de l'étiquette TIC
-#define MAX_SIZE_VALUE            13                    // Taille maximum de la valeur TIC
+#define MAX_BUFFER_SIZE           110                   // Taille max d'une ligne (Standard : horodate + donnée + étiquette)
+#define MAX_TIC_DATA              100                   // Nombre d'étiquettes max dans une trame Standard complète
+#define MAX_SIZE_LABEL            17                    // Taille max étiquette (ex: "PJOURF+1" ou "DATEHORL") + \0
+#define MAX_SIZE_VALUE            64                    // Taille max valeur (ex: trames d'horodatage ou données BRUT) + \0
 
 //< Structure de Configurations fonctionnelles figées (Configurable uniquement à la configuration de l'équippement)
 typedef struct

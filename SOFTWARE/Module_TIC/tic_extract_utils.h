@@ -4,15 +4,21 @@
 #include "websocket_utils.h"
 #include "common_utils.h"
 
-//< MACRO d'encapsulation au protocole Linky
-#define ETX_CAR_0           '\x03'  // Caractère de fin de chaine protocole
-#define STX_CAR_0           '\x02'  // Caractère de début de chaine protocole
-#define ETX_CAR_1           '\n'    // Caractère de fin de chaine
-#define STX_CAR_1           '\r'    // Caractère de début de chaine
+//< Caractères d'encapsulation de trame globale Linky
+#define STX_CAR_0           '\x02'  // <STX> Start of Text (Début de trame)
+#define ETX_CAR_0           '\x03'  // <ETX> End of Text (Fin de trame)
 
-//< Define des Timeout
+//< Caractères de début et fin de ligne (communs aux deux modes)
+#define STX_CAR_1           '\x0A'  // <LF> Début de groupe (0x0A)
+#define ETX_CAR_1           '\x0D'  // <CR> Fin de groupe (0x0D)
+
+//< Séparateurs de champs
+#define SEP_CAR_HISTORIQUE  '\x20'  // <SP> Space (0x20)
+#define SEP_CAR_STANDARD    '\x09'  // <HT> Horizontal Tab (0x09)
+
+//< Define des Timeouts
 #define TIMEOUT_ACCUMULATE  20000   // TimeOut d'accumulation
-#define TIMEOUT_LINKY_DATA  1000    // TimeOut 
+#define TIMEOUT_LINKY_DATA  2500    // TimeOut inter-trames
 
 //< Structure des données TIC_EXTRACT
 typedef struct {
@@ -24,8 +30,9 @@ typedef struct {
  * \fn void tic_extract_init(TIC_DATA_t *tic)
  * \brief Fonction permettant l'initialisation du service tic_extract
  * \param in, le pointeur vers la structure de données TIC_DATA_t
+ * \param in, le mode du compteur (Standard ou Historique)
  */
-void tic_extract_init(TIC_DATA_t *tic);
+void tic_extract_init(TIC_DATA_t *tic, uint8_t standard_mode);
 
 /**
  * \fn void tic_extract_handler(void)

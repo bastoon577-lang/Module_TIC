@@ -96,8 +96,7 @@ static void html_generate_exploitation_page(void) {
       web_server.sendContent("    addTableLinkyData(\"tab1\",\"" + String(tic_data.etiquette[i]) + "\",\"--\");\n");
   }
   else
-    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée "
-                       "TIC accessible, assurez vous que votre ModuleTIC soit bien connecté au compteur Linky !</p>';"));
+    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée TIC !</p>';"));
   
   // Données Générales
   web_server.sendContent(F("    createTable(\"tab2\");\n"));
@@ -151,8 +150,11 @@ static void html_generate_configuration_page(void) {
   web_server.sendContent(F("  document.body.classList.add('theme-dark');"));
   web_server.sendContent(FPSTR(scriptsCommon));
   web_server.sendContent(FPSTR(scriptsPageConfig));
-  for(uint8_t i=0;i<wifi_equipments;i++)
-    web_server.sendContent("  addWifiSpot(\""+WiFi.SSID(i)+"\");\n");
+  for(uint8_t i=0;i<wifi_equipments;i++) {
+    web_server.sendContent(F("  addWifiSpot(\""));
+    web_server.sendContent(WiFi.SSID(i));
+    web_server.sendContent(F("\");\n"));
+  }
   web_server.sendContent(F("  </script>\n"));
   web_server.sendContent(F("</body>\n"));
   web_server.sendContent(F("</html>"));
@@ -262,9 +264,9 @@ void setup() {
     web_server.on("/theme",HTTP_POST,handle_action_exploitation_button);
     web_server.on("/reset",HTTP_POST,handle_action_exploitation_button);
 
+    tic_extract_init(&tic_data,static_conf.is_standard_mode);           // Initialisation du service TIC_EXTRACT
     ws_server_init(static_conf.portWs,&tic_data);                       // Initialisation du service WebSocket Server
     hal_uart_init(static_conf.is_standard_mode);                        // Initialisation de l'UART
-    tic_extract_init(&tic_data);                                        // Initialisation du service TIC_EXTRACT
     led_init(TIMEOUT_LED_LENT);                                         // Clignotement lent de la LED
   }
   else                                                                  // L'equipement est vierge
@@ -320,6 +322,7 @@ void loop() {
   if(!static_conf.is_configured) {                                      // L'équippement n'est pas configuré
     dns_server.processNextRequest();                                    // Traitement des requêtes DNS du portail captif
     if(millis() - timer_scan_network >= TIMEOUT_SCAN_NETWORK) {
+      WiFi.scanDelete();                                                // Libération du buffer de scan
       wifi_equipments = WiFi.scanNetworks();                            // Scan des reseaux Wifi disponibles
       timer_scan_network = millis();
     }  
