@@ -106,11 +106,11 @@ const char* htmlPageConfig PROGMEM = R"rawliteral(
   </div>
   
   <div id="container15" class="container">
-    <h1>Configuration Linky</h1>
-    <p></p>
+    <h1>Configuration Compteur</h1>
+    <p>Sélectionnez le mode désiré :</p>
 	<button class="button" onclick="handleRequest('mod0',function(){next(20);})">Historique</button>
     <button class="button" onclick="handleRequest('mod1',function(){next(20);})">Standard</button>
-	<p class="alert">Le mode est géré par le compteur Linky, il est essentiel de vérifier celui-ci en navigant dans son Menu</p>
+	<p class="alert">Le mode est géré par le compteur, veuillez vous référer aux détails du compteur</p>
   </div>
 
   <div id="container20" class="container">
