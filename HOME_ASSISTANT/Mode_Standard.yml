@@ -1,0 +1,177 @@
+# Board: Generic ESP8266 Board (Generic)
+# Definition: definitions/boards/generic-esp8266/manifest.yaml
+
+esphome:
+  name: moduletic
+  friendly_name: moduletic
+  platformio_options:
+    board_build.f_cpu: 160000000L 
+
+esp8266:
+  board: esp01_1m
+
+# Logger réseau (désactivé sur le port série physique pour libérer GPIO3)
+logger:
+  baud_rate: 0
+
+api:
+  encryption:
+    key: "nSN3O2k2vJQF/manp1gNaaKbBh+/YFRb8zR41Hzk0a0="
+
+ota:
+  - platform: esphome
+
+web_server:
+  port: 80
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: ModuleTIC
+    password: ModuleTIC
+  on_connect:
+    then:
+      - lambda: |-
+          id(clignotement_interval).stop_poller();
+          id(clignotement_interval).set_update_interval(1000);
+          id(clignotement_interval).start_poller();
+  on_disconnect:
+    then:
+      - lambda: |-
+          id(clignotement_interval).stop_poller();
+          id(clignotement_interval).set_update_interval(250);
+          id(clignotement_interval).start_poller();
+
+captive_portal:
+
+# ==========================================
+#  CONFIGURATION TÉLÉINFO LINKY (MODE STANDARD)
+# ==========================================
+
+uart:
+  id: uart_bus
+  rx_pin:
+    number: GPIO3
+    mode:
+      input: true
+      pullup: true
+  baud_rate: 9600
+  data_bits: 7
+  parity: EVEN
+  stop_bits: 1
+  rx_buffer_size: 1024
+
+teleinfo:
+  id: myteleinfo
+  historical_mode: false
+  update_interval: 500ms
+
+# ==========================================
+#  ÉTIQUETTES / CAPTEURS ÉNERGIE & PUISSANCE
+# ==========================================
+
+sensor:
+  # --- Puissances et Courants ---
+  - platform: teleinfo
+    tag_name: "SINSTS"
+    name: "SINSTS"
+    unit_of_measurement: "VA"
+
+  - platform: teleinfo
+    tag_name: "SMAXSN"
+    name: "SMAXSN"
+    unit_of_measurement: "VA"
+
+  - platform: teleinfo
+    tag_name: "IRMS1"
+    name: "IRMS1"
+    unit_of_measurement: "A"
+
+  - platform: teleinfo
+    tag_name: "URMS1"
+    name: "URMS1"
+    unit_of_measurement: "V"
+
+  # --- Index d'Énergie Totaux & Tarifaires ---
+  - platform: teleinfo
+    tag_name: "EAST"
+    name: "EAST"
+    unit_of_measurement: "Wh"
+
+  - platform: teleinfo
+    tag_name: "EASF01"
+    name: "EASF01"
+    unit_of_measurement: "Wh"
+
+  - platform: teleinfo
+    tag_name: "EASF02"
+    name: "EASF02"
+    unit_of_measurement: "Wh"
+
+  # --- Injection (Producteurs / Photovoltaïque) ---
+  - platform: teleinfo
+    tag_name: "EAIT"
+    name: "EAIT"
+    unit_of_measurement: "Wh"
+
+text_sensor:
+  # --- Métadonnées Compteur & Tarifs ---
+  - platform: teleinfo
+    tag_name: "ADSC"
+    name: "ADSC"
+
+  - platform: teleinfo
+    tag_name: "VTIC"
+    name: "VTIC"
+
+  - platform: teleinfo
+    tag_name: "NGTF"
+    name: "NGTF"
+
+  - platform: teleinfo
+    tag_name: "LTARF"
+    name: "LTARF"
+
+# ==========================================
+#  BOUTON RESET & LED
+# ==========================================
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: false
+      inverted: false
+    name: "Bouton Reset Wifi"
+    internal: true
+    on_press:
+      then:
+        - lambda: |-
+            esphome::wifi::global_wifi_component->save_wifi_sta("", "");
+        - button.press: reboot_button
+
+button:
+  - platform: restart
+    id: reboot_button
+    name: "Redémarrer"
+    internal: true
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: led_gpio2
+
+switch:
+  - platform: output
+    output: led_gpio2
+    id: led_bleue
+    internal: true
+
+interval:
+  - id: clignotement_interval
+    interval: 250ms
+    then:
+      - switch.toggle: led_bleue

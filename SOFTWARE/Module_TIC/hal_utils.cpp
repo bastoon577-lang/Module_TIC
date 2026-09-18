@@ -4,9 +4,18 @@
  * \fn void hal_init(void)
  */
 void hal_init(void) {
-  TIC_UART.begin(1200,SERIAL_7E1);                                    // Configuration de l'UART
   pinMode(GPIO_DMD_RESET,INPUT_PULLUP);                               // Configuration de l'entrée Reboot
   pinMode(GPIO_LED_IHM,OUTPUT);                                       // Configuration de la LED
+}
+
+/**
+ * \fn hal_uart_init(uint8_t standard_mode)
+ */
+void hal_uart_init(uint8_t standard_mode) {
+  if(standard_mode)
+    TIC_UART.begin(STANDARD_BAUDRATES,SERIAL_7E1);                   // Configuration de l'UART pour le mode Standard
+  else
+    TIC_UART.begin(HISTORIC_BAUDRATES,SERIAL_7E1);                   // Configuration de l'UART pour le mode Historique
 }
 
 /**

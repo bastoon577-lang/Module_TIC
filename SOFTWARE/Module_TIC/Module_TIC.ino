@@ -96,13 +96,14 @@ static void html_generate_exploitation_page(void) {
       web_server.sendContent("    addTableLinkyData(\"tab1\",\"" + String(tic_data.etiquette[i]) + "\",\"--\");\n");
   }
   else
-    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée "
-                       "TIC accessible, assurez vous que votre ModuleTIC soit bien connecté au compteur Linky !</p>';"));
+    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée TIC !</p>';"));
   
   // Données Générales
   web_server.sendContent(F("    createTable(\"tab2\");\n"));
-  str_to_write = (dhcp_enable)?"Actif":"Inactif";
   web_server.sendContent("    addTableRow(\"tab2\",\"Logiciel\",\""+String(V_LOGICIEL)+"\");\n");
+  str_to_write = (static_conf.is_standard_mode)?"Standard":"Historique";
+  web_server.sendContent("    addTableRow(\"tab2\",\"Mode\",\""+str_to_write+"\");\n");
+  str_to_write = (dhcp_enable)?"Actif":"Inactif";
   web_server.sendContent("    addTableRow(\"tab2\",\"DHCP\",\""+str_to_write+"\");\n");
   web_server.sendContent("    addTableRow(\"tab2\",\"Hostname\",\""+String(static_conf.Hostname)+"\");\n");
   web_server.sendContent("    addTableRow(\"tab2\",\"MAC\",\""+String(WiFi.macAddress())+"\");\n");
@@ -149,8 +150,11 @@ static void html_generate_configuration_page(void) {
   web_server.sendContent(F("  document.body.classList.add('theme-dark');"));
   web_server.sendContent(FPSTR(scriptsCommon));
   web_server.sendContent(FPSTR(scriptsPageConfig));
-  for(uint8_t i=0;i<wifi_equipments;i++)
-    web_server.sendContent("  addWifiSpot(\""+WiFi.SSID(i)+"\");\n");
+  for(uint8_t i=0;i<wifi_equipments;i++) {
+    web_server.sendContent(F("  addWifiSpot(\""));
+    web_server.sendContent(WiFi.SSID(i));
+    web_server.sendContent(F("\");\n"));
+  }
   web_server.sendContent(F("  </script>\n"));
   web_server.sendContent(F("</body>\n"));
   web_server.sendContent(F("</html>"));
@@ -182,6 +186,8 @@ static void handle_action_configuration_button(void) {
   uint8_t conf = post_data.charAt(3)-'0';
   if(post_data.startsWith("wif"))
     static_conf.is_wifi_network_used = (conf)?1:0;
+  else if(post_data.startsWith("mod"))
+    static_conf.is_standard_mode = (conf)?1:0;
   else if(post_data.endsWith("end"))                                    // Signal de fin de configuration
   {
     static_conf.is_configured = 1;                                      // Positionnement du flag de configuration
@@ -258,8 +264,9 @@ void setup() {
     web_server.on("/theme",HTTP_POST,handle_action_exploitation_button);
     web_server.on("/reset",HTTP_POST,handle_action_exploitation_button);
 
+    tic_extract_init(&tic_data,static_conf.is_standard_mode);           // Initialisation du service TIC_EXTRACT
     ws_server_init(static_conf.portWs,&tic_data);                       // Initialisation du service WebSocket Server
-    tic_extract_init(&tic_data);                                        // Initialisation du service TIC_EXTRACT
+    hal_uart_init(static_conf.is_standard_mode);                        // Initialisation de l'UART
     led_init(TIMEOUT_LED_LENT);                                         // Clignotement lent de la LED
   }
   else                                                                  // L'equipement est vierge
@@ -283,6 +290,8 @@ void setup() {
     });
     web_server.on("/wif0",HTTP_POST,handle_action_configuration_button);
     web_server.on("/wif1",HTTP_POST,handle_action_configuration_button);
+    web_server.on("/mod0",HTTP_POST,handle_action_configuration_button);
+    web_server.on("/mod1",HTTP_POST,handle_action_configuration_button);
     web_server.on("/adv0",HTTP_POST,handle_action_configuration_input);
     web_server.on("/hot1",HTTP_POST,handle_action_configuration_input);
     web_server.on("/ssi1",HTTP_POST,handle_action_configuration_input);
@@ -313,6 +322,7 @@ void loop() {
   if(!static_conf.is_configured) {                                      // L'équippement n'est pas configuré
     dns_server.processNextRequest();                                    // Traitement des requêtes DNS du portail captif
     if(millis() - timer_scan_network >= TIMEOUT_SCAN_NETWORK) {
+      WiFi.scanDelete();                                                // Libération du buffer de scan
       wifi_equipments = WiFi.scanNetworks();                            // Scan des reseaux Wifi disponibles
       timer_scan_network = millis();
     }  

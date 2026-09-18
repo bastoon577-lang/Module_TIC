@@ -1,0 +1,189 @@
+# Board: Generic ESP8266 Board (Generic)
+# Definition: definitions/boards/generic-esp8266/manifest.yaml
+
+esphome:
+  name: moduletic
+  friendly_name: moduletic
+
+esp8266:
+  board: esp01_1m
+
+# logger désactivé sur le port série car GPIO3 (RX) sert au Linky
+logger:
+  baud_rate: 0 # Désactive l'écriture sur le port série (RX/TX)
+
+api:
+  encryption:
+    key: "nSN3O2k2vJQF/manp1gNaaKbBh+/YFRb8zR41Hzk0a0="
+
+ota:
+  - platform: esphome
+
+# ==========================================
+#  SERVEUR WEB EMBARQUÉ
+# ==========================================
+
+web_server:
+  port: 80
+
+# ==========================================
+#  CONFIGURATION WI-FI ET GESTION DES CLIGNOTEMENTS
+# ==========================================
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: ModuleTIC
+    password: ModuleTIC
+  on_connect:
+    then:
+      - lambda: |-
+          id(clignotement_interval).stop_poller();
+          id(clignotement_interval).set_update_interval(1000);
+          id(clignotement_interval).start_poller();
+  on_disconnect:
+    then:
+      - lambda: |-
+          id(clignotement_interval).stop_poller();
+          id(clignotement_interval).set_update_interval(250);
+          id(clignotement_interval).start_poller();
+
+captive_portal:
+
+# ==========================================
+#  CONFIGURATION TÉLÉINFO LINKY (HISTORIQUE)
+# ==========================================
+
+uart:
+  id: uart_bus
+  rx_pin:
+    number: GPIO3
+    mode:
+      input: true
+      pullup: true
+  baud_rate: 1200
+  data_bits: 7
+  parity: EVEN
+  stop_bits: 1
+
+# Composant Téléinfo
+teleinfo:
+  id: myteleinfo
+  historical_mode: true
+  update_interval: 500ms
+
+# --- Capteurs Numériques ---
+sensor:
+  - platform: teleinfo
+    tag_name: "PAPP"
+    name: "PAPP"
+    unit_of_measurement: "VA"
+    device_class: "apparent_power"
+    icon: mdi:flash
+
+  - platform: teleinfo
+    tag_name: "HCHP"
+    name: "HCHP"
+    unit_of_measurement: "Wh"
+    device_class: "energy"
+    state_class: "total_increasing"
+
+  - platform: teleinfo
+    tag_name: "HCHC"
+    name: "HCHC"
+    unit_of_measurement: "Wh"
+    device_class: "energy"
+    state_class: "total_increasing"
+
+  - platform: teleinfo
+    tag_name: "IINST"
+    name: "IINST"
+    unit_of_measurement: "A"
+    icon: mdi:current-ac
+
+  - platform: teleinfo
+    tag_name: "IMAX"
+    name: "IMAX"
+    unit_of_measurement: "A"
+    icon: mdi:current-ac
+
+  - platform: teleinfo
+    tag_name: "ISOUSC"
+    name: "ISOUSC"
+    unit_of_measurement: "A"
+    icon: mdi:current-ac
+
+# --- Capteurs Texte ---
+text_sensor:
+  - platform: teleinfo
+    tag_name: "ADCO"
+    name: "ADCO"
+    icon: mdi:identifier
+
+  - platform: teleinfo
+    tag_name: "OPTARIF"
+    name: "OPTARIF"
+    icon: mdi:file-document-outline
+
+  - platform: teleinfo
+    tag_name: "PTEC"
+    name: "PTEC"
+    icon: mdi:clock-outline
+
+  - platform: teleinfo
+    tag_name: "HHPHC"
+    name: "HHPHC"
+    icon: mdi:clock-check-outline
+
+  - platform: teleinfo
+    tag_name: "MOTDETAT"
+    name: "MOTDETAT"
+    icon: mdi:information-outline
+
+# ==========================================
+#  BOUTON DE RESET WI-FI SUR GPIO0
+# ==========================================
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: false
+      inverted: false
+    name: "Bouton Reset Wifi"
+    internal: true
+    on_press:
+      then:
+        - lambda: |-
+            esphome::wifi::global_wifi_component->save_wifi_sta("", "");
+        - button.press: reboot_button
+
+button:
+  - platform: restart
+    id: reboot_button
+    name: "Redémarrer"
+    internal: true
+
+# ==========================================
+#  LED INTERNE SUR GPIO2 (CLIGNOTANTE DYNAMIQUE)
+# ==========================================
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: led_gpio2
+
+switch:
+  - platform: output
+    output: led_gpio2
+    id: led_bleue
+    internal: true
+
+interval:
+  - id: clignotement_interval
+    interval: 250ms # Démarre en clignotement rapide
+    then:
+      - switch.toggle: led_bleue
