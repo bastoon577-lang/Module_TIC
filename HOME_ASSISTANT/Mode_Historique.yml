@@ -61,7 +61,6 @@ uart:
     number: GPIO3
     mode:
       input: true
-      pullup: true
   baud_rate: 1200
   data_bits: 7
   parity: EVEN
@@ -96,11 +95,31 @@ sensor:
     device_class: "energy"
     state_class: "total_increasing"
 
+# Cas du compteur Monophasé
   - platform: teleinfo
     tag_name: "IINST"
     name: "IINST"
     unit_of_measurement: "A"
     icon: mdi:current-ac
+
+# Cas du compteur Triphasés    
+#  - platform: teleinfo
+#    tag_name: "IINST1"
+#    name: "IINST1"
+#    unit_of_measurement: "A"
+#    icon: mdi:current-ac
+
+#  - platform: teleinfo
+#    tag_name: "IINST2"
+#    name: "IINST2"
+#    unit_of_measurement: "A"
+#    icon: mdi:current-ac
+
+#  - platform: teleinfo
+#    tag_name: "IINST3"
+#    name: "IINST3"
+#    unit_of_measurement: "A"
+#    icon: mdi:current-ac
 
   - platform: teleinfo
     tag_name: "IMAX"

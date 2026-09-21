@@ -55,7 +55,6 @@ uart:
     number: GPIO3
     mode:
       input: true
-      pullup: true
   baud_rate: 9600
   data_bits: 7
   parity: EVEN
@@ -73,32 +72,79 @@ teleinfo:
 
 sensor:
   # --- Puissances et Courants ---
+
+# Cas du compteur Monophasé
   - platform: teleinfo
     tag_name: "SINSTS"
     name: "SINSTS"
     unit_of_measurement: "VA"
+
+# Cas du compteur Triphasés
+#  - platform: teleinfo
+#    tag_name: "SINSTS1"
+#    name: "SINSTS1"
+#    unit_of_measurement: "VA"
+
+#  - platform: teleinfo
+#    tag_name: "SINSTS2"
+#    name: "SINSTS2"
+#    unit_of_measurement: "VA"
+
+#  - platform: teleinfo
+#    tag_name: "SINSTS3"
+#    name: "SINSTS3"
+#    unit_of_measurement: "VA"
+  
+  - platform: teleinfo
+    tag_name: "SINSTI"
+    name: "SINSTI"
+    unit_of_measurement: "VA"
+    
+  - platform: teleinfo
+    tag_name: "PCOUP"
+    name: "PCOUP"
+    unit_of_measurement: "kVA"
 
   - platform: teleinfo
     tag_name: "SMAXSN"
     name: "SMAXSN"
     unit_of_measurement: "VA"
 
+# Cas du compteur Monophasé et Triphasés
   - platform: teleinfo
     tag_name: "IRMS1"
     name: "IRMS1"
     unit_of_measurement: "A"
+    
+# Cas du compteur Triphasés
+#  - platform: teleinfo
+#    tag_name: "IRMS2"
+#    name: "IRMS2"
+#    unit_of_measurement: "A"
 
+#  - platform: teleinfo
+#    tag_name: "IRMS3"
+#    name: "IRMS3"
+#    unit_of_measurement: "A"
+
+# Cas du compteur Monophasé et Triphasés
   - platform: teleinfo
     tag_name: "URMS1"
     name: "URMS1"
     unit_of_measurement: "V"
+    
+# Cas du compteur Triphasés
+#  - platform: teleinfo
+#    tag_name: "URMS2"
+#    name: "URMS2"
+#    unit_of_measurement: "V"
+
+#  - platform: teleinfo
+#    tag_name: "URMS3"
+#    name: "URMS3"
+#    unit_of_measurement: "V"
 
   # --- Index d'Énergie Totaux & Tarifaires ---
-  - platform: teleinfo
-    tag_name: "EAST"
-    name: "EAST"
-    unit_of_measurement: "Wh"
-
   - platform: teleinfo
     tag_name: "EASF01"
     name: "EASF01"
@@ -120,10 +166,6 @@ text_sensor:
   - platform: teleinfo
     tag_name: "ADSC"
     name: "ADSC"
-
-  - platform: teleinfo
-    tag_name: "VTIC"
-    name: "VTIC"
 
   - platform: teleinfo
     tag_name: "NGTF"
