@@ -6,7 +6,7 @@
 #include "hal_utils.h"
 
 //< MACRO de version logicielle
-#define V_LOGICIEL                "v1.1.0"              // Version Logicielle
+#define V_LOGICIEL                "v1.1.1"              // Version Logicielle
 
 //< MACRO du Mode Access Point
 #define AP_SSID                   "ModuleTIC"           // SSID ModuleTIC Access Point
@@ -52,6 +52,7 @@ typedef struct
 {
   uint8_t   theme                 :1;                   // Theme (0 : fonce & 1 : clair)
   uint8_t   RUF                   :7;                   // Reserve Usage Future
+  char      ihm_filter[128];                            // Filtre lié à l'affichage des données TIC sur l'IHM
 } VOLATILE_CONF_FIELDS_t;
 
 //< Structure des donnees TIC
