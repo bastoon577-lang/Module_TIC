@@ -68,68 +68,125 @@ static void erase_eeprom_and_reboot(void) {
 }
 
 /**
+ * \fn void send_content_chunked(const char* p, bool isProgmem = true, size_t chunkSize = 512)
+ * \brief Fonction permettant de splitter une chaîne de caractère (RAM ou PROGMEM) au serveur Web par morceaux.
+ * \param in, Le pointeur vers la chaine de caractères
+ * \param in, is_progmem lorsque la données est en mémoire Flash (PROGMEM / FPSTR / F()) (En PROGMEM par défaut)
+ * \param in, chunk_size la taille des blocs à envoyer (512 octets par défaut)
+ */
+static void send_content_chunked(const char* p, bool is_progmem = true, size_t chunk_size = 512) {
+  if (!p) return;
+
+  size_t len=(is_progmem)?strlen_P(p):strlen(p);
+  char buffer[chunk_size];
+
+  for(size_t i=0;i<len;i+=chunk_size) {
+    size_t chunk=((len-i)<chunk_size)?(len-i):chunk_size;
+    
+    if(is_progmem) {
+      memcpy_P(buffer,p+i,chunk);
+      web_server.sendContent(buffer,chunk);
+    } else {
+      web_server.sendContent(p+i,chunk);
+    }
+  }
+}
+
+/**
  * \fn void html_generate_exploitation_page(void)
  * \brief Fonction de generation du flux HTML/CSS/JS pour la page d'exploitation.
  */
 static void html_generate_exploitation_page(void) {
-  String str_to_write = "";
+  char buf[128];
   web_server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   
-  web_server.sendContent(FPSTR(htmlHeader));
+  // En-tête et styles HTML
+  send_content_chunked((const char*)htmlHeader, true);
   web_server.sendContent(F("<style>"));
-  web_server.sendContent(FPSTR(cssSteelSheet));
-  web_server.sendContent(F("</style>\n"));
-  web_server.sendContent(F("</head>\n"));
-  web_server.sendContent(F("<body>"));
-  web_server.sendContent(FPSTR(htmlPageExploit));
+  send_content_chunked((const char*)cssSteelSheet, true);
+  web_server.sendContent(F("</style>\n</head>\n<body>"));
+  send_content_chunked((const char*)htmlPageExploit, true);
+  
+  // Début des scripts
   web_server.sendContent(F("  <script>"));
-  if(!volatile_conf.theme)
+  if (!volatile_conf.theme) {
     web_server.sendContent(F("\n  document.body.classList.add('theme-dark');\n"));
-  web_server.sendContent(FPSTR(scriptsCommon));
-  web_server.sendContent(FPSTR(scriptsPageExploit));
-  
-  // Visualisation des donnees dynamiques en table
-  // Données TIC
-  if(tic_data._nb_elem) {
-    web_server.sendContent(F("    createTable(\"tab1\");\n"));
-    for (uint8_t i = 0; i < tic_data._nb_elem; i++)
-      web_server.sendContent("    addTableLinkyData(\"tab1\",\"" + String(tic_data.etiquette[i]) + "\",\"--\");\n");
   }
-  else
-    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée TIC !</p>';"));
+  send_content_chunked((const char*)scriptsCommon, true);
+  send_content_chunked((const char*)scriptsPageExploit, true);
+
+  // Données TIC
+  if (tic_data._nb_elem) {
+    web_server.sendContent(F("    createTable(\"tab1\");\n"));
+    for (uint8_t i = 0; i < tic_data._nb_elem; i++) {
+      snprintf(buf, sizeof(buf), "    addTableLinkyData(\"tab1\",\"%s\",\"--\");\n", tic_data.etiquette[i]);
+      web_server.sendContent(buf);
+    }
+  } else {
+    web_server.sendContent(F("    document.getElementById(\"tab1\").innerHTML = '<p class=\"alert\">Aucune donnée TIC !</p>';\n"));
+  }
   
-  // Données Générales
+  // Données Générales (Réseau & Système)
   web_server.sendContent(F("    createTable(\"tab2\");\n"));
-  web_server.sendContent("    addTableRow(\"tab2\",\"Logiciel\",\""+String(V_LOGICIEL)+"\");\n");
-  str_to_write = (static_conf.is_standard_mode)?"Standard":"Historique";
-  web_server.sendContent("    addTableRow(\"tab2\",\"Mode\",\""+str_to_write+"\");\n");
-  str_to_write = (dhcp_enable)?"Actif":"Inactif";
-  web_server.sendContent("    addTableRow(\"tab2\",\"DHCP\",\""+str_to_write+"\");\n");
-  web_server.sendContent("    addTableRow(\"tab2\",\"Hostname\",\""+String(static_conf.Hostname)+"\");\n");
-  web_server.sendContent("    addTableRow(\"tab2\",\"MAC\",\""+String(WiFi.macAddress())+"\");\n");
-  str_to_write = (dhcp_enable)?WiFi.localIP().toString():ip_stringification(static_conf.address);
-  str_to_write = (dhcp_enable)?WiFi.localIP().toString():ip_stringification(static_conf.address);
-  uint8_t defaultAdr[4] = {192,168,4,1};
-  str_to_write = (!static_conf.is_wifi_network_used)?ip_stringification(defaultAdr):str_to_write;
-  web_server.sendContent("    addTableRow(\"tab2\",\"IPv4\",\""+str_to_write+"\");\n");
-  str_to_write = (dhcp_enable)?WiFi.subnetMask().toString():ip_stringification(static_conf.subnet);
-  uint8_t defaultSub[4] = {255,255,255,0};
-  str_to_write = (!static_conf.is_wifi_network_used)?ip_stringification(defaultSub):str_to_write;
-  web_server.sendContent("    addTableRow(\"tab2\",\"Masque de sous réseau\",\""+str_to_write+"\");\n");
-  str_to_write = (dhcp_enable)?WiFi.gatewayIP().toString():ip_stringification(static_conf.gateway);
-  uint8_t defaultGat[4] = {192,168,4,1};
-  str_to_write = (!static_conf.is_wifi_network_used)?ip_stringification(defaultGat):str_to_write;
-  web_server.sendContent("    addTableRow(\"tab2\",\"Passerelle par défaut\",\""+str_to_write+"\");\n");
-  web_server.sendContent("    addTableRow(\"tab2\",\"Port Web\",\""+String(static_conf.port)+"\");\n");
-  web_server.sendContent("    addTableRow(\"tab2\",\"Port WebSocket\",\""+String(static_conf.portWs)+"\");\n");
   
-  web_server.sendContent("    initWebSocket("+String(static_conf.portWs)+");\n");
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Logiciel\",\"%s\");\n", V_LOGICIEL);
+  web_server.sendContent(buf);
+  
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Mode\",\"%s\");\n", static_conf.is_standard_mode ? "Standard" : "Historique");
+  web_server.sendContent(buf);
+  
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"DHCP\",\"%s\");\n", dhcp_enable ? "Actif" : "Inactif");
+  web_server.sendContent(buf);
+  
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Hostname\",\"%s\");\n", static_conf.Hostname);
+  web_server.sendContent(buf);
+  
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"MAC\",\"%s\");\n", WiFi.macAddress().c_str());
+  web_server.sendContent(buf);
+  
+  // Calcul et mise en forme IPv4
+  const uint8_t defaultAdr[4] = {192, 168, 4, 1};
+  String ip_str = (!static_conf.is_wifi_network_used) 
+                  ? ip_stringification((uint8_t*)defaultAdr) 
+                  : (dhcp_enable ? WiFi.localIP().toString() : ip_stringification(static_conf.address));
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"IPv4\",\"%s\");\n", ip_str.c_str());
+  web_server.sendContent(buf);
+  
+  // Calcul et mise en forme Masque de sous-réseau
+  const uint8_t defaultSub[4] = {255, 255, 255, 0};
+  String mask_str = (!static_conf.is_wifi_network_used) 
+                    ? ip_stringification((uint8_t*)defaultSub) 
+                    : (dhcp_enable ? WiFi.subnetMask().toString() : ip_stringification(static_conf.subnet));
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Masque de sous réseau\",\"%s\");\n", mask_str.c_str());
+  web_server.sendContent(buf);
+  
+  // Calcul et mise en forme Passerelle
+  const uint8_t defaultGat[4] = {192, 168, 4, 1};
+  String gw_str = (!static_conf.is_wifi_network_used) 
+                  ? ip_stringification((uint8_t*)defaultGat) 
+                  : (dhcp_enable ? WiFi.gatewayIP().toString() : ip_stringification(static_conf.gateway));
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Passerelle par défaut\",\"%s\");\n", gw_str.c_str());
+  web_server.sendContent(buf);
+  
+  // Ports Web et WebSocket
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Port Web\",\"%u\");\n", static_conf.port);
+  web_server.sendContent(buf);
+  
+  snprintf(buf, sizeof(buf), "    addTableRow(\"tab2\",\"Port WebSocket\",\"%u\");\n", static_conf.portWs);
+  web_server.sendContent(buf);
+  
+  // Init WebSocket
+  snprintf(buf, sizeof(buf), "    initWebSocket(%u);\n", static_conf.portWs);
+  web_server.sendContent(buf);
+
+  // Filtre de données de la table
+  snprintf(buf, sizeof(buf), "    updateTableDisplay('tab1','%s');\n", volatile_conf.ihm_filter);
+  web_server.sendContent(buf);
+
+  // Fin de page
   web_server.sendContent(F("  };\n"));
-  web_server.sendContent(FPSTR(scriptsPageExploitExtend));
-  web_server.sendContent(F("  </script>\n"));
-  web_server.sendContent(F("</body>\n"));
-  web_server.sendContent(F("</html>"));
-  web_server.sendContent("");
+  send_content_chunked((const char*)scriptsPageExploitExtend, true);
+  web_server.sendContent(F("  </script>\n</body>\n</html>"));
 }
 
 /**
@@ -137,31 +194,34 @@ static void html_generate_exploitation_page(void) {
  * \brief Fonction de generation du flux HTML/CSS/JS pour la page de configuration.
  */
 static void html_generate_configuration_page(void) {
+  char buf[96];
   web_server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   
-  web_server.sendContent(FPSTR(htmlHeader));
+  // En-tête HTML et styles
+  send_content_chunked((const char*)htmlHeader, true);
   web_server.sendContent(F("<style>"));
-  web_server.sendContent(FPSTR(cssSteelSheet));
-  web_server.sendContent(F("</style>\n"));
-  web_server.sendContent(F("</head>\n"));
-  web_server.sendContent(F("<body>"));
-  web_server.sendContent(FPSTR(htmlPageConfig));
-  web_server.sendContent(F("  <script>"));
-  web_server.sendContent(F("  document.body.classList.add('theme-dark');"));
-  web_server.sendContent(FPSTR(scriptsCommon));
-  web_server.sendContent(FPSTR(scriptsPageConfig));
-  for(uint8_t i=0;i<wifi_equipments;i++) {
-    web_server.sendContent(F("  addWifiSpot(\""));
-    web_server.sendContent(WiFi.SSID(i));
-    web_server.sendContent(F("\");\n"));
+  send_content_chunked((const char*)cssSteelSheet, true);
+  web_server.sendContent(F("</style>\n</head>\n<body>"));
+  
+  // Structure principale HTML
+  send_content_chunked((const char*)htmlPageConfig, true);
+  
+  // Début des scripts
+  web_server.sendContent(F("  <script>\n  document.body.classList.add('theme-dark');\n"));
+  send_content_chunked((const char*)scriptsCommon, true);
+  send_content_chunked((const char*)scriptsPageConfig, true);
+  
+  for (uint8_t i = 0; i < wifi_equipments; i++) {
+    snprintf(buf, sizeof(buf), "  addWifiSpot(\"%s\");\n", WiFi.SSID(i).c_str());
+    web_server.sendContent(buf);
   }
-  web_server.sendContent(F("  </script>\n"));
-  web_server.sendContent(F("</body>\n"));
-  web_server.sendContent(F("</html>"));
+  
+  // Fin de la page
+  web_server.sendContent(F("  </script>\n</body>\n</html>"));
 }
 
 /**
- * \fn void handle_action_exploitation_button()
+ * \fn void handle_action_exploitation_button(void)
  * \brief Fonction permettant la gestion des input de type BOUTON des requetes POST en mode exploitation.
  */
 static void handle_action_exploitation_button(void) {
@@ -178,7 +238,21 @@ static void handle_action_exploitation_button(void) {
 }
 
 /**
- * \fn void handle_action_configuration_button()
+ * \fn void handle_action_exploitation_input(void)
+ * \brief Fonction permettant la gestion des input de type TEXT des requetes POST en mode exploitation.
+ */
+static void handle_action_exploitation_input(void) {
+  if(web_server.arg("filtr").length() > 0)
+    strncpy(volatile_conf.ihm_filter,web_server.arg("filtr").c_str(),sizeof(volatile_conf.ihm_filter)-1);
+  
+  // Sauvegarde de la configuration en mémoire EEPROM, ceci n'est pas optimisé car chaque modification entraine une ecriture !
+  eeprom_write_data(&volatile_conf,EEPROM_VOLATILE_CFG);
+
+  web_server.send(200,F("text/html"),"");
+}
+
+/**
+ * \fn void handle_action_configuration_button(void)
  * \brief Fonction permettant la gestion des input de type BOUTON des requetes POST en mode configuration.
  */
 static void handle_action_configuration_button(void) {
@@ -198,7 +272,7 @@ static void handle_action_configuration_button(void) {
 }
 
 /**
- * \fn void handle_action_configuration_input()
+ * \fn void handle_action_configuration_input(void)
  * \brief Fonction permettant la gestion des input de type TEXT des requetes POST en mode configuration.
  */
 static void handle_action_configuration_input(void) {
@@ -263,6 +337,7 @@ void setup() {
     });
     web_server.on("/theme",HTTP_POST,handle_action_exploitation_button);
     web_server.on("/reset",HTTP_POST,handle_action_exploitation_button);
+    web_server.on("/filtr",HTTP_POST,handle_action_exploitation_input);
 
     tic_extract_init(&tic_data,static_conf.is_standard_mode);           // Initialisation du service TIC_EXTRACT
     ws_server_init(static_conf.portWs,&tic_data);                       // Initialisation du service WebSocket Server
