@@ -146,14 +146,19 @@ sensor:
 
   # --- Index d'Énergie Totaux & Tarifaires ---
   - platform: teleinfo
-    tag_name: "EASF01"
-    name: "EASF01"
+    tag_name: "EAST"
+    name: "EAST"
     unit_of_measurement: "Wh"
+  
+#  - platform: teleinfo
+#    tag_name: "EASF01"
+#    name: "EASF01"
+#    unit_of_measurement: "Wh"
 
-  - platform: teleinfo
-    tag_name: "EASF02"
-    name: "EASF02"
-    unit_of_measurement: "Wh"
+#  - platform: teleinfo
+#    tag_name: "EASF02"
+#    name: "EASF02"
+#    unit_of_measurement: "Wh"
 
   # --- Injection (Producteurs / Photovoltaïque) ---
   - platform: teleinfo
