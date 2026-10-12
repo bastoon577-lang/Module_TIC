@@ -22,7 +22,7 @@ __attribute__((optimize(0))) static void tic_extract_parser(const String& str) {
   if (str.length() > MAX_BUFFER_SIZE || str.length() < 5) return;                 // Overflow de la chaine, échappement
 
   const char sep = (tic_extract_is_standard_mode) ? SEP_CAR_STANDARD :            // Sélection du séparateur (Historique / Standard)
-                                                              SEP_CAR_HISTORIQUE;
+                                                    SEP_CAR_HISTORIQUE;
 
   const int check_sum_index = str.length() - 1;
   const char checksum = str.charAt(check_sum_index);
@@ -57,7 +57,8 @@ __attribute__((optimize(0))) static void tic_extract_parser(const String& str) {
     data = raw_payload.substring(first_sep + 1);                                  // Extraction de la donnée
   }
 
-  if (!data.length() && horodate.length() > 0) {
+  // Si c'est l'étiquette DATE, la valeur se trouve dans horodate (data étant vide)
+  if (label.equals("DATE") && !data.length() && horodate.length() > 0) {
     data = horodate;
   }
                                                                                   // Reconstitution exacte du buffer de calcul de Checksum selon le mode
@@ -72,13 +73,15 @@ __attribute__((optimize(0))) static void tic_extract_parser(const String& str) {
   } else {                                                                        // Mode Historique (N'INCLUT PAS l'espace de fin)
     payload_for_checksum = label + sep + data;
   }
-                                                                                  // Validation Checksum
-  if (tic_extract_checksum_compute(payload_for_checksum) != checksum) {
-    return;
+                                                                                  // Validation Checksum sauf pour la trame "DATE"
+  if (!label.equals("DATE")) {
+    if (tic_extract_checksum_compute(payload_for_checksum) != checksum) {
+      return;
+    }
   }
-                                                                                  // Contrôles de taille et de format
+                                                                                  // Contrôles de taille et de format (on autorise data vide uniquement pour DATE si besoin)
   if (!label.length() || label.length() > MAX_SIZE_LABEL) return;
-  if (!data.length() || data.length() > MAX_SIZE_VALUE) return;
+  if (data.length() > MAX_SIZE_VALUE) return;
 
   // Mise à jour d'une données existante de la table
   for (uint8_t i = 0; i < tic_extract.tic_data->_nb_elem; i++) {                  // Parcourt de la table de données

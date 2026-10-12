@@ -242,9 +242,9 @@ static void handle_action_exploitation_button(void) {
  * \brief Fonction permettant la gestion des input de type TEXT des requetes POST en mode exploitation.
  */
 static void handle_action_exploitation_input(void) {
-  if(web_server.arg("filtr").length() > 0)
+  if (web_server.hasArg("filtr")) {
     strncpy(volatile_conf.ihm_filter,web_server.arg("filtr").c_str(),sizeof(volatile_conf.ihm_filter)-1);
-  
+  }
   // Sauvegarde de la configuration en mémoire EEPROM, ceci n'est pas optimisé car chaque modification entraine une ecriture !
   eeprom_write_data(&volatile_conf,EEPROM_VOLATILE_CFG);
 
