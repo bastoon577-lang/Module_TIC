@@ -264,7 +264,10 @@ static void handle_action_configuration_button(void) {
     static_conf.is_standard_mode = (conf)?1:0;
   else if(post_data.endsWith("end"))                                    // Signal de fin de configuration
   {
+    volatile_conf.ihm_filter[0] = '\0';                                 // Initialisation du filtre IHM
     static_conf.is_configured = 1;                                      // Positionnement du flag de configuration
+    
+    eeprom_write_data(&volatile_conf,EEPROM_VOLATILE_CFG);              // Sauvegarde des données en mémoire EEPROM
     eeprom_write_data(&static_conf,EEPROM_STATIC_CFG);                  // Sauvegarde des données en mémoire EEPROM
     reboot_set();                                                       // Redémarrage de l'équippement pour la prise en compte
   }
